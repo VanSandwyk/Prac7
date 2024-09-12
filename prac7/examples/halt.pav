@@ -1,0 +1,11 @@
+void main () { $C+    $ST
+// halt.pav
+// Extensions to halt and code listing pragma
+  int reason = 42;
+  write("start");
+  halt("aborted ", reason);
+  write("continue");
+  halt("if you see this your compiler is wrong");;
+  write("finished");
+  halt;
+}

@@ -1,0 +1,13 @@
+void main () { $C+
+// sqr+sqrt.pav
+  int i = 10, j = 90;
+  int[] list = new int[12];
+  list[1] = 1;
+  list[2] = 2;
+  i = sqr(list[2]);
+  write(i);
+  list[4] = sqrt(list[1]*3);
+  write(list[4]); 
+  i = sqr(j);
+  write(sqr(9), sqrt(-12), sqr(sqrt(4)), sqr(9*i)));
+}

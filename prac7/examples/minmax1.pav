@@ -1,0 +1,14 @@
+void main () { $C+
+// minmax1.pav
+// Miscellaneous min / max / sqr
+  int i = 10, j = 90;
+  int[] list = new int[12];
+  list[1] = 1;
+  list[2] = 2;
+  i = sqr(list[2]);
+  write(i);
+  list[4] = max(list[1], list[2]);
+  write(list[4]); 
+  i = min(2,3,j);
+  write(max(90), min(3, 5, 2, 12), max(min(2, 4), min(21, 4)));
+}
