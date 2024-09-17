@@ -89,6 +89,16 @@ import java.util.*;
       emit(PVM.not);
     } // CodeGen.negateBoolean
 
+    public static void sqrInteger() {
+      // Generates code to squar integer value on top of evaluation stack
+        emit(PVM.sqr);
+    } // CodeGen.negateInteger
+
+    public static void sqrtInteger() {
+      // Generates code to square root positive integer value on top of evaluation stack
+        emit(PVM.sqrt);
+    } // CodeGen.negateInteger
+
     public static void binaryOp(int op) {
     // Generates code to pop two values A,B from evaluation stack
     // and push value A op B

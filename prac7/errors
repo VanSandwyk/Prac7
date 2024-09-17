@@ -1,0 +1,13 @@
+Parva\Parser.java:96: error: <identifier> expected
+    listcode = false;
+            ^
+Parva\Parser.java:213: error: ';' expected
+				if (debug) {CodeGen.heap()};
+				                          ^
+Parva\Parser.java:216: error: ';' expected
+				if (debug) {CodeGen.stack()};
+				                           ^
+Parva\Parser.java:219: error: ';' expected
+				if (debug) {Table.printable()};
+				                             ^
+4 errors

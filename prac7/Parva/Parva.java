@@ -4,6 +4,9 @@ package Parva;
    P.D. Terry, Rhodes University; modified KL Bradshaw, 2021 */
 
 //  ----------------------- you may need to change the "import" clauses:
+//g21v4969 Jacobus
+//g21w7943 William
+//g20m1710 Kaizer 
 
 import java.io.*;
 import java.util.*;
@@ -17,7 +20,7 @@ import library.*;
     }
 
     public static void main (String[] args) {
-      boolean mergeErrors = false;
+      boolean mergeErrors = false; 
       String inputName = null;
 
       // ------------------------- process command line parameters:
@@ -27,7 +30,9 @@ import library.*;
       for (int i = 0; i < args.length; i++) {
         if (args[i].toLowerCase().equals("-l")) mergeErrors = true;
         else if (args[i].toLowerCase().equals("-d")) Parser.debug = true;
-          else inputName = args[i];
+        else if (args[i].toLowerCase().equals("-c")) PVM.listCode();   // Added ListCod if -c is entered in the command line 
+        else if (args[i].toLowerCase().equals("-w")) Parser.Summarize(); // Summarize the warnings
+          else inputName = args[i]; 
       }
       if (inputName == null) {
         System.err.println("No input file specified");

@@ -94,7 +94,8 @@ import library.*;
       inc     =  68,
       dec     =  69,
       heap    =  70,
-
+      sqr     =  71,
+      sqrt    =  72,
       nul     = 255;                         // leave gap for future
 
     public static String[] mnemonics = new String[PVM.nul + 1];
@@ -120,7 +121,8 @@ import library.*;
       badVal   =  8,
       badAdr   =  9,
       badAll   = 10,
-      nullRef  = 11;
+      nullRef  = 11,
+      rootNeg  = 12;
 
     static int ps;
 
@@ -202,6 +204,7 @@ import library.*;
         case badData: results.write("Invalid data");           break;
         case noData:  results.write("No more data");           break;
         case divZero: results.write("Division by zero");       break;
+        case rootNeg: results.write("Negative square root");   break;
         case badOp:   results.write("Illegal opcode");         break;
         case badInd:  results.write("Subscript out of range"); break;
         case badVal:  results.write("Value out of range");     break;
@@ -486,6 +489,15 @@ import library.*;
             tos = pop();
             if (tos == 0) ps = divZero;
             else push(pop() / tos);
+            break;
+          case PVM.sqr:           // square number
+            tos = pop();
+            push(tos * tos);
+            break;
+          case PVM.sqrt:          // square root postive number
+            tos = pop();
+            if (tos < 0) ps = rootNeg;
+            push(tos * tos);
             break;
           case PVM.rem:           // integer division (remainder)
             tos = pop();

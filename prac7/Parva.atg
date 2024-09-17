@@ -356,9 +356,13 @@ PRODUCTIONS
 
   RelExp<out int type>                       (. int type2;
                                                 int op; .)
-  =  AddExp<out type>
+  =  AddExp<out type> 
+    | ("sqrt" "(" AddExp<out type> ")")
+    | ("sqr" "(" AddExp<out type> ")")
      [ RelOp<out op>
-       AddExp<out type2>                     (. if (!isArith(type) || !isArith(type2))
+       AddExp<out type2>                    
+      | ("sqrt" "(" AddExp<out type2> ")")
+      | ("sqr" "(" AddExp<out type2> ")")     (. if (!isArith(type) || !isArith(type2))
                                                   SemError("incomparable operand types");
                                                 CodeGen.comparison(op, type);
                                                 type = Types.boolType; .)
@@ -368,8 +372,12 @@ PRODUCTIONS
   AddExp<out int type>                       (. int type2;
                                                 int op; .)
   =  MultExp<out type>
+    | ("sqrt" "(" MultExp<out type> ")")
+    | ("sqr" "(" MultExp<out type> ")")
      { AddOp<out op>
-       MultExp<out type2>                    (. if (!isArith(type) || !isArith(type2)) {
+       MultExp<out type2>                    
+        | ("sqrt" "(" MultExp<out type> ")")
+        | ("sqr" "(" MultExp<out type> ")")     (. if (!isArith(type) || !isArith(type2)) {
                                                   SemError("arithmetic operands needed");
                                                   type = Types.noType;
                                                 }
@@ -381,8 +389,12 @@ PRODUCTIONS
   MultExp<out int type>                      (. int type2;
                                                 int op; .)
   =  Factor<out type>
+    | ("sqrt" "(" Factor<out type> ")")
+    | ("sqr" "(" Factor<out type> ")")
      { MulOp<out op>
-       Factor<out type2>                     (. if (!isArith(type) || !isArith(type2)) {
+       Factor<out type2>                     
+       | ("sqrt" "(" Factor<out type2> ")")
+       | ("sqr" "(" Factor<out type2> ")")       (. if (!isArith(type) || !isArith(type2)) {
                                                   SemError("arithmetic operands needed");
                                                   type = Types.noType;
                                                 }
@@ -392,13 +404,18 @@ PRODUCTIONS
   .
 
   Factor<out int type>                       (. type = Types.noType; .)
-  =    Primary<out type>
-     | "+" Factor<out type>                  (. if (!isArith(type)) {
+  =   Primary<out type>
+     | "+" Factor<out type>                  
+     | "+" ("sqrt" "(" Factor<out type> ")")
+     | "+" ("sqr" "(" Factor<out type> ")")   (. if (!isArith(type)) {
                                                   SemError("arithmetic operand needed");
                                                   type = Types.noType;
                                                 }
                                                 else type = Types.intType; .)
-     | "-" Factor<out type>                  (. if (!isArith(type)) {
+     | "-" Factor<out type>                  
+     | "-" Factor<out type>                  
+     | "-" ("sqrt" "(" Factor<out type> ")")
+     | "-" ("sqr" "(" Factor<out type> ")")   (. if (!isArith(type)) {
                                                   SemError("arithmetic operand needed");
                                                   type = Types.noType;
                                                 }
@@ -426,7 +443,7 @@ PRODUCTIONS
                                                     SemError("wrong kind of identifier");
                                                     break;
                                                 } .)
-     | Constant<out con>                     (. type = con.type;
+     | Constant<out con>                      (. type = con.type;
                                                 CodeGen.loadConstant(con.value); .)
      | "new"
        (   BasicType<out type>
@@ -480,7 +497,9 @@ PRODUCTIONS
   .
 
   IntConst<out int value>
-  =  number                                  (. try {
+  =  number                                  
+    | ("sqrt" "(" number ")")
+    | ("sqr" "(" number ")")                  (. try {
                                                   value = Integer.parseInt(token.val);
                                                 } catch (NumberFormatException e) {
                                                   value = 0; SemError("number out of range");

@@ -1,0 +1,6 @@
+void main() {
+    halt("life sucks lol");
+    write(sqr(9));
+    a = sqrt(b*(1+c));
+    c = sqr(sqrt(c));
+}
