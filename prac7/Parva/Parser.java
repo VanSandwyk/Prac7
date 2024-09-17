@@ -377,6 +377,13 @@ public class Parser {
 		ExpectWeak(semicolon_Sym, 1);
 	}
 
+	static void HaltStatement(String s) {
+		Expect(halt_Sym);
+		CodeGen.writeString(s);
+		CodeGen.leaveProgram();
+		ExpectWeak(semicolon_Sym, 1);
+	}
+
 	static void ReturnStatement() {
 		Expect(return_Sym);
 		CodeGen.leaveProgram();
@@ -391,7 +398,23 @@ public class Parser {
 		ExpectWeak(semicolon_Sym, 1);
 	}
 
+	static void ReadLineStatement() {
+		Expect(read_Sym);
+		Expect(lparen_Sym);
+		ReadNextList();
+		Expect(rparen_Sym);
+		ExpectWeak(semicolon_Sym, 1);
+	}
+
 	static void WriteStatement() {
+		Expect(write_Sym);
+		Expect(lparen_Sym);
+		WriteList();
+		Expect(rparen_Sym);
+		ExpectWeak(semicolon_Sym, 1);
+	}
+
+	static void WriteLineStatement() {
 		Expect(write_Sym);
 		Expect(lparen_Sym);
 		WriteList();
@@ -567,6 +590,13 @@ public class Parser {
 		}
 	}
 
+	static void ReadNextList() {
+		ReadNextElement();
+		while (WeakSeparator(comma_Sym, 6, 7)) {
+			ReadNextElement();
+		}
+	}
+
 	static void ReadElement() {
 		String str;
 		DesType des;
@@ -582,6 +612,28 @@ public class Parser {
 			  case Types.boolType:
 			case Types.charType:
 			    CodeGen.read(des.type); break;
+			  default:
+			    SemError("cannot read this type"); break;
+			}
+		} else SynErr(49);
+	}
+
+	static void ReadNextElement() {
+		String str;
+		DesType des;
+		if (la.kind == stringLit_Sym) {
+			str = StringConst();
+			CodeGen.writeLine();
+			CodeGen.writeString(str);
+		} else if (la.kind == identifier_Sym) {
+			des = Designator();
+			if (des.entry.kind != Kinds.Var)
+			  SemError("wrong kind of identifier");
+			switch (des.type) {
+			  case Types.intType:
+			  case Types.boolType:
+			case Types.charType:
+			    CodeGen.readNextLine(des.type); break;
 			  default:
 			    SemError("cannot read this type"); break;
 			}

@@ -132,9 +132,20 @@ import java.util.*;
       switch (type) {
         case Types.intType:  emit(PVM.inpi); break;
         case Types.boolType: emit(PVM.inpb); break;
-		case Types.charType: emit(PVM.inpc); break;
+		    case Types.charType: emit(PVM.inpc); break;
       }
     } // CodeGen.read
+
+    public static void readNextLine(int type) {
+      // Generates code to read a value of specified type starting from new line
+      // and store it at the address found on top of stack
+        switch (type) {
+          case Types.intType:  emit(PVM.inpi); break;
+          case Types.boolType: emit(PVM.inpb); break;
+          case Types.charType: emit(PVM.inpc); break;
+        }
+        emit(PVM.inpl);
+      } // CodeGen.read
 
     public static void readLine() {
     // Generates code to skip to next line of data
