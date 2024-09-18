@@ -140,6 +140,8 @@ PRODUCTIONS
             | AssignmentStatement
             | IfStatement<frame>
             | WhileStatement<frame>
+            | RepeatUntilStatement<frame>
+            | DoWhileStatement<frame>
             | HaltStatement
             | ReturnStatement
             | ReadStatement
@@ -259,7 +261,23 @@ PRODUCTIONS
                                                 loopExit.here(); .)
   .
 //-----------------------------------------------------------------------------------------------------------------------------------------------
- 
+//-----------------------------------------------------------------------------------------------------------------------------------------------
+//Task 4
+  RepeatUntilStatement<StackFrame frame>
+
+  = "repeat" 
+     Statement<frame> ";"
+     {Statement<frame> ";"}
+     "until" "(" Condition ")"              (. if(!Condition.type.equals(Boolean)) Parser.warning("Condition in repeat-until must be a boolean expression.");.)
+  .
+
+  DoWhileStatement<StackFrame frame>
+  = "do" "{" 
+    Statement<frame> ";" {Statement<frame> ";"} "}" 
+    "while" "(" Condition ")"               (. if(!Condition.type.equals(Boolean)) Parser.warning("Condition in do-while must be a boolean expression.");.)
+  .
+
+//------------------------------------------------------------------------------------------------------------------------------------------------
   HaltStatement
   =  "halt"                                  (. CodeGen.leaveProgram(); .)
      WEAK ";"
