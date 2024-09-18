@@ -378,8 +378,8 @@
  377                                                 CodeGen.binaryOp(op); .)
  378      }
  379   .
- 380 
- 381   Factor<out int type>                       (. type = Types.noType; .)
+ 380 //Task 5 sqrt
+ 381 Factor<out int type>                       (. type = Types.noType; .)
  382   =    Primary<out type>
  383      | "+" Factor<out type>                  (. if (!isArith(type)) {
  384                                                   SemError("arithmetic operand needed");
@@ -396,86 +396,103 @@
  395                                                   SemError("Boolean operand needed");
  396                                                 type = Types.boolType;
  397                                                 CodeGen.negateBoolean(); .)
- 398   .
- 399 
- 400   Primary<out int type>                      (. type = Types.noType;
- 401                                                 int size;
- 402                                                 DesType des;
- 403                                                 ConstRec con; .)
- 404   =    Designator<out des>                   (. type = des.type;
- 405                                                 switch (des.entry.kind) {
- 406                                                   case Kinds.Var:
- 407                                                     CodeGen.dereference();
- 408                                                     break;
- 409                                                   case Kinds.Con:
- 410                                                     CodeGen.loadConstant(des.entry.value);
- 411                                                     break;
- 412                                                   default:
- 413                                                     SemError("wrong kind of identifier");
- 414                                                     break;
- 415                                                 } .)
- 416      | Constant<out con>                     (. type = con.type;
- 417                                                 CodeGen.loadConstant(con.value); .)
- 418      | "new"
- 419        (   BasicType<out type>
- 420            "[" Expression<out size>          (. if (!isArith(size))
- 421                                                   SemError("array size must be integer");
- 422                                                 type++; .)
- 423            "]"
- 424        )                                     (. CodeGen.allocate(); .)
- 425 
- 426      | "(" Expression<out type> ")"
- 427   .
- 428 
- 429   AddOp<out int op>                          (. op = CodeGen.nop; .)
- 430   =    "+"                                   (. op = CodeGen.add; .)
- 431      | "-"                                   (. op = CodeGen.sub; .)
- 432   .
- 433 
- 434   MulOp<out int op>                          (. op = CodeGen.nop; .)
- 435   =    "*"                                   (. op = CodeGen.mul; .)
- 436      | "/"                                   (. op = CodeGen.div; .)
- 437      | "%"                                   (. op = CodeGen.rem; .)
- 438   .
- 439 
- 440   EqualOp<out int op>                        (. op = CodeGen.nop; .)
- 441   =    "=="                                  (. op = CodeGen.ceq; .)
- 442      | "!="                                  (. op = CodeGen.cne; .)
- 443   .
- 444 
- 445   RelOp<out int op>                          (. op = CodeGen.nop; .)
- 446   =    "<"                                   (. op = CodeGen.clt; .)
- 447      | "<="                                  (. op = CodeGen.cle; .)
- 448      | ">"                                   (. op = CodeGen.cgt; .)
- 449      | ">="                                  (. op = CodeGen.cge; .)
- 450   .
- 451 
- 452   AssignOp = "=" .
- 453 
- 454   Ident<out String name>
- 455   =  identifier                              (. name = token.val; .)
- 456   .
- 457 
- 458   StringConst<out String str>
- 459   =  stringLit                               (. str = token.val;
- 460                                                 str = unescape(str.substring(1, str.length() - 1)); .)
- 461   .
- 462 
- 463   CharConst<out int value>
- 464   =  charLit                                 (. String str = token.val;
- 465                                                 str = unescape(str.substring(1, str.length() - 1));
- 466                                                 value = str.charAt(0); .)
+ 398      | "sqr" "(" Expression<out int argType> ")"  (. if (!isArith(argType)) {
+ 399                                                       SemError("arithmetic operand needed for sqr()");
+ 400                                                       type = Types.noType;
+ 401                                                     } else {
+ 402                                                       type = argType;
+ 403                                                       CodeGen.loadValue(); 
+ 404                                                       CodeGen.duplicate();  // Duplicate value for squaring
+ 405                                                       CodeGen.binaryOp(CodeGen.mul);  // Multiply the value by itself
+ 406                                                     } .)
+ 407      | "sqrt" "(" Expression<out int argType> ")" (. if (!isArith(argType)) {
+ 408                                                       SemError("arithmetic operand needed for sqrt()");
+ 409                                                       type = Types.noType;
+ 410                                                     } else {
+ 411                                                       type = argType;
+ 412                                                       CodeGen.loadValue(); 
+ 413                                                       CodeGen.sqrt();  // Generate code to compute sqrt
+ 414                                                     } .)
+ 415   .
+ 416 
+ 417   Primary<out int type>                      (. type = Types.noType;
+ 418                                                 int size;
+ 419                                                 DesType des;
+ 420                                                 ConstRec con; .)
+ 421   =    Designator<out des>                   (. type = des.type;
+ 422                                                 switch (des.entry.kind) {
+ 423                                                   case Kinds.Var:
+ 424                                                     CodeGen.dereference();
+ 425                                                     break;
+ 426                                                   case Kinds.Con:
+ 427                                                     CodeGen.loadConstant(des.entry.value);
+ 428                                                     break;
+ 429                                                   default:
+ 430                                                     SemError("wrong kind of identifier");
+ 431                                                     break;
+ 432                                                 } .)
+ 433      | Constant<out con>                     (. type = con.type;
+ 434                                                 CodeGen.loadConstant(con.value); .)
+ 435      | "new"
+ 436        (   BasicType<out type>
+ 437            "[" Expression<out size>          (. if (!isArith(size))
+ 438                                                   SemError("array size must be integer");
+ 439                                                 type++; .)
+ 440            "]"
+ 441        )                                     (. CodeGen.allocate(); .)
+ 442 
+ 443      | "(" Expression<out type> ")"
+ 444   .
+ 445 
+ 446   AddOp<out int op>                          (. op = CodeGen.nop; .)
+ 447   =    "+"                                   (. op = CodeGen.add; .)
+ 448      | "-"                                   (. op = CodeGen.sub; .)
+ 449   .
+ 450 
+ 451   MulOp<out int op>                          (. op = CodeGen.nop; .)
+ 452   =    "*"                                   (. op = CodeGen.mul; .)
+ 453      | "/"                                   (. op = CodeGen.div; .)
+ 454      | "%"                                   (. op = CodeGen.rem; .)
+ 455   .
+ 456 
+ 457   EqualOp<out int op>                        (. op = CodeGen.nop; .)
+ 458   =    "=="                                  (. op = CodeGen.ceq; .)
+ 459      | "!="                                  (. op = CodeGen.cne; .)
+ 460   .
+ 461 
+ 462   RelOp<out int op>                          (. op = CodeGen.nop; .)
+ 463   =    "<"                                   (. op = CodeGen.clt; .)
+ 464      | "<="                                  (. op = CodeGen.cle; .)
+ 465      | ">"                                   (. op = CodeGen.cgt; .)
+ 466      | ">="                                  (. op = CodeGen.cge; .)
  467   .
  468 
- 469   IntConst<out int value>
- 470   =  number                                  (. try {
- 471                                                   value = Integer.parseInt(token.val);
- 472                                                 } catch (NumberFormatException e) {
- 473                                                   value = 0; SemError("number out of range");
- 474                                                 } .)
- 475   .
- 476 
- 477 END Parva.
- 478 
+ 469   AssignOp = "=" .
+ 470 
+ 471   Ident<out String name>
+ 472   =  identifier                              (. name = token.val; .)
+ 473   .
+ 474 
+ 475   StringConst<out String str>
+ 476   =  stringLit                               (. str = token.val;
+ 477                                                 str = unescape(str.substring(1, str.length() - 1)); .)
+ 478   .
+ 479 
+ 480   CharConst<out int value>
+ 481   =  charLit                                 (. String str = token.val;
+ 482                                                 str = unescape(str.substring(1, str.length() - 1));
+ 483                                                 value = str.charAt(0); .)
+ 484   .
+ 485 
+ 486   IntConst<out int value>
+ 487   =  number                                  (. try {
+ 488                                                   value = Integer.parseInt(token.val);
+ 489                                                 } catch (NumberFormatException e) {
+ 490                                                   value = 0; SemError("number out of range");
+ 491                                                 } .)
+ 492   .
+ 493 
+ 494 END Parva.
+ 495 
 
 0 errors detected

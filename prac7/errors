@@ -1,0 +1,34 @@
+Parva\Parser.java:807: error: method loadValue in class CodeGen cannot be applied to given types;
+			 CodeGen.loadValue();
+			        ^
+  required: Entry
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+Parva\Parser.java:808: error: cannot find symbol
+			 CodeGen.duplicate();  // Duplicate value for squaring
+			        ^
+  symbol:   method duplicate()
+  location: class CodeGen
+Parva\Parser.java:823: error: method loadValue in class CodeGen cannot be applied to given types;
+			 CodeGen.loadValue();
+			        ^
+  required: Entry
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+Parva\Parser.java:824: error: cannot find symbol
+			 CodeGen.sqrt();  // Generate code to compute sqrt
+			        ^
+  symbol:   method sqrt()
+  location: class CodeGen
+Parva\Parva.java:33: error: method listCode in class PVM cannot be applied to given types;
+        else if (args[i].toLowerCase().equals("-c")) PVM.listCode();   // Added ListCod if -c is entered in the command line 
+                                                        ^
+  required: String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+Parva\Parva.java:34: error: cannot find symbol
+        else if (args[i].toLowerCase().equals("-w")) Parser.Summarize(); // Summarize the warnings
+                                                           ^
+  symbol:   method Summarize()
+  location: class Parser
+6 errors

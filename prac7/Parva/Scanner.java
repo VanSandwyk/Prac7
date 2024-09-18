@@ -67,8 +67,8 @@ public class Scanner {
 	static final char EOL = '\n';
 	static final int  eofSym = 0;
 	static final int charSetSize = 256;
-	static final int maxT = 44;
-	static final int noSym = 44;
+	static final int maxT = 46;
+	static final int noSym = 46;
 	// terminals
 	static final int EOF_SYM = 0;
 	static final int identifier_Sym = 1;
@@ -103,21 +103,23 @@ public class Scanner {
 	static final int plus_Sym = 30;
 	static final int minus_Sym = 31;
 	static final int bang_Sym = 32;
-	static final int new_Sym = 33;
-	static final int star_Sym = 34;
-	static final int slash_Sym = 35;
-	static final int percent_Sym = 36;
-	static final int equalequal_Sym = 37;
-	static final int bangequal_Sym = 38;
-	static final int less_Sym = 39;
-	static final int lessequal_Sym = 40;
-	static final int greater_Sym = 41;
-	static final int greaterequal_Sym = 42;
-	static final int equal_Sym = 43;
-	static final int NOT_SYM = 44;
+	static final int sqr_Sym = 33;
+	static final int sqrt_Sym = 34;
+	static final int new_Sym = 35;
+	static final int star_Sym = 36;
+	static final int slash_Sym = 37;
+	static final int percent_Sym = 38;
+	static final int equalequal_Sym = 39;
+	static final int bangequal_Sym = 40;
+	static final int less_Sym = 41;
+	static final int lessequal_Sym = 42;
+	static final int greater_Sym = 43;
+	static final int greaterequal_Sym = 44;
+	static final int equal_Sym = 45;
+	static final int NOT_SYM = 46;
 	// pragmas
-	static final int DebugOn_Sym = 45;
-	static final int DebugOff_Sym = 46;
+	static final int DebugOn_Sym = 47;
+	static final int DebugOff_Sym = 48;
 
 	static short[] start = {
 	  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -264,6 +266,8 @@ public class Scanner {
 		else if (lit.compareTo("return") == 0) t.kind = return_Sym;
 		else if (lit.compareTo("read") == 0) t.kind = read_Sym;
 		else if (lit.compareTo("write") == 0) t.kind = write_Sym;
+		else if (lit.compareTo("sqr") == 0) t.kind = sqr_Sym;
+		else if (lit.compareTo("sqrt") == 0) t.kind = sqrt_Sym;
 		else if (lit.compareTo("new") == 0) t.kind = new_Sym;
 	}
 

@@ -89,6 +89,16 @@ import java.util.*;
       emit(PVM.not);
     } // CodeGen.negateBoolean
 
+    public static void sqrInteger() {
+      // Generates code to squar integer value on top of evaluation stack
+        emit(PVM.sqr);
+    } // CodeGen.negateInteger
+
+    public static void sqrtInteger() {
+      // Generates code to square root positive integer value on top of evaluation stack
+        emit(PVM.sqrt);
+    } // CodeGen.negateInteger
+
     public static void binaryOp(int op) {
     // Generates code to pop two values A,B from evaluation stack
     // and push value A op B
@@ -132,9 +142,20 @@ import java.util.*;
       switch (type) {
         case Types.intType:  emit(PVM.inpi); break;
         case Types.boolType: emit(PVM.inpb); break;
-		case Types.charType: emit(PVM.inpc); break;
+		    case Types.charType: emit(PVM.inpc); break;
       }
     } // CodeGen.read
+
+    public static void readNextLine(int type) {
+      // Generates code to read a value of specified type starting from new line
+      // and store it at the address found on top of stack
+        switch (type) {
+          case Types.intType:  emit(PVM.inpi); break;
+          case Types.boolType: emit(PVM.inpb); break;
+          case Types.charType: emit(PVM.inpc); break;
+        }
+        emit(PVM.inpl);
+      } // CodeGen.read
 
     public static void readLine() {
     // Generates code to skip to next line of data
