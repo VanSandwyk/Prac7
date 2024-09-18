@@ -2,9 +2,7 @@ package Parva;
 
 import java.util.*;
 import library.*;
-//g21v4969 Jacobus
-//g21w7943 William
-//g20m1710 Kaizer
+
 
 
 import java.io.*;
@@ -46,11 +44,11 @@ public class Parser {
 	public static final int write_Sym = 27;
 	public static final int barbar_Sym = 28;
 	public static final int andand_Sym = 29;
-	public static final int sqrt_Sym = 30;
-	public static final int sqr_Sym = 31;
-	public static final int plus_Sym = 32;
-	public static final int minus_Sym = 33;
-	public static final int bang_Sym = 34;
+	public static final int plus_Sym = 30;
+	public static final int minus_Sym = 31;
+	public static final int bang_Sym = 32;
+	public static final int sqr_Sym = 33;
+	public static final int sqrt_Sym = 34;
 	public static final int new_Sym = 35;
 	public static final int star_Sym = 36;
 	public static final int slash_Sym = 37;
@@ -66,22 +64,10 @@ public class Parser {
 	// pragmas
 	public static final int DebugOn_Sym = 47;
 	public static final int DebugOff_Sym = 48;
-	public static final int HeapDump_Sym = 49;
-	public static final int StackDump_Sym = 50;
-	public static final int SymbolTable_Sym = 51;
-	public static final int CodOn_Sym = 52;
-	public static final int CodOn_Sym = 53;
-	public static final int Warning_Sym = 54;
 
 	public static final int maxT = 46;
 	public static final int _DebugOn = 47;
 	public static final int _DebugOff = 48;
-	public static final int _HeapDump = 49;
-	public static final int _StackDump = 50;
-	public static final int _SymbolTable = 51;
-	public static final int _CodOn = 52;
-	public static final int _CodOn = 53;
-	public static final int _Warning = 54;
 
 	static final boolean T = true;
 	static final boolean x = false;
@@ -93,8 +79,6 @@ public class Parser {
 
 	public static boolean
     debug    = false;
-    listcode = false;
-
 
   static final boolean
     known = true;
@@ -208,24 +192,6 @@ public class Parser {
 			}
 			if (la.kind == DebugOff_Sym) {
 				debug     = false;
-			}
-			if (la.kind == HeapDump_Sym) {
-				if (debug) {CodeGen.heap()};
-			}
-			if (la.kind == StackDump_Sym) {
-				if (debug) {CodeGen.stack()};
-			}
-			if (la.kind == SymbolTable_Sym) {
-				if (debug) {Table.printable()};
-			}
-			if (la.kind == CodOn_Sym) {
-				listCode = true;
-			}
-			if (la.kind == CodOn_Sym) {
-				listCode = false;
-			}
-			if (la.kind == Warning_Sym) {
-				Parser.Summarize();
 			}
 
 			la = token; /* pdt */
@@ -403,7 +369,6 @@ public class Parser {
 		Expect(rparen_Sym);
 		CodeGen.branchFalse(loopExit);
 		Statement(frame);
-		if(frame.size == 0) Parser.Warning("Warning: Empty while condition");
 		CodeGen.branch(loopStart);
 		loopExit.here();
 	}
@@ -455,7 +420,7 @@ public class Parser {
 	static ConstRec Constant() {
 		ConstRec con;
 		con = new ConstRec();
-		if (la.kind == number_Sym || la.kind == sqrt_Sym || la.kind == sqr_Sym) {
+		if (la.kind == number_Sym) {
 			con.value = IntConst();
 			con.type = Types.intType;
 		} else if (la.kind == charLit_Sym) {
@@ -476,24 +441,12 @@ public class Parser {
 
 	static int IntConst() {
 		int value;
-		if (la.kind == number_Sym) {
-			Get();
-		} else if (la.kind == sqrt_Sym) {
-			Get();
-			Expect(lparen_Sym);
-			Expect(number_Sym);
-			Expect(rparen_Sym);
-		} else if (la.kind == sqr_Sym) {
-			Get();
-			Expect(lparen_Sym);
-			Expect(number_Sym);
-			Expect(rparen_Sym);
-			try {
-			 value = Integer.parseInt(token.val);
-			} catch (NumberFormatException e) {
-			 value = 0; SemError("number out of range");
-			}
-		} else SynErr(50);
+		Expect(number_Sym);
+		try {
+		  value = Integer.parseInt(token.val);
+		} catch (NumberFormatException e) {
+		  value = 0; SemError("number out of range");
+		}
 		return value;
 	}
 
@@ -535,7 +488,7 @@ public class Parser {
 		} else if (la.kind == char_Sym) {
 			Get();
 			type = Types.charType;
-		} else SynErr(51);
+		} else SynErr(50);
 		return type;
 	}
 
@@ -634,7 +587,7 @@ public class Parser {
 			  default:
 			    SemError("cannot read this type"); break;
 			}
-		} else SynErr(52);
+		} else SynErr(51);
 	}
 
 	static String StringConst() {
@@ -670,7 +623,7 @@ public class Parser {
 			  default:
 			    break;
 			}
-		} else SynErr(53);
+		} else SynErr(52);
 	}
 
 	static int AndExp() {
@@ -710,39 +663,15 @@ public class Parser {
 		int type;
 		int type2;
 		int op;
-		if (StartOf(9)) {
-			type = AddExp();
-		} else if (la.kind == sqrt_Sym) {
-			Get();
-			Expect(lparen_Sym);
-			type = AddExp();
-			Expect(rparen_Sym);
-		} else if (la.kind == sqr_Sym) {
-			Get();
-			Expect(lparen_Sym);
-			type = AddExp();
-			Expect(rparen_Sym);
-			if (StartOf(10)) {
-				if (StartOf(11)) {
-					op = RelOp();
-					type2 = AddExp();
-				} else if (la.kind == sqrt_Sym) {
-					Get();
-					Expect(lparen_Sym);
-					type2 = AddExp();
-					Expect(rparen_Sym);
-				} else {
-					Get();
-					Expect(lparen_Sym);
-					type2 = AddExp();
-					Expect(rparen_Sym);
-					if (!isArith(type) || !isArith(type2))
-					 SemError("incomparable operand types");
-					CodeGen.comparison(op, type);
-					type = Types.boolType;
-				}
-			}
-		} else SynErr(54);
+		type = AddExp();
+		if (StartOf(10)) {
+			op = RelOp();
+			type2 = AddExp();
+			if (!isArith(type) || !isArith(type2))
+			  SemError("incomparable operand types");
+			CodeGen.comparison(op, type);
+			type = Types.boolType;
+		}
 		return type;
 	}
 
@@ -755,7 +684,7 @@ public class Parser {
 		} else if (la.kind == bangequal_Sym) {
 			Get();
 			op = CodeGen.cne;
-		} else SynErr(55);
+		} else SynErr(53);
 		return op;
 	}
 
@@ -763,41 +692,17 @@ public class Parser {
 		int type;
 		int type2;
 		int op;
-		if (StartOf(9)) {
-			type = MultExp();
-		} else if (la.kind == sqrt_Sym) {
-			Get();
-			Expect(lparen_Sym);
-			type = MultExp();
-			Expect(rparen_Sym);
-		} else if (la.kind == sqr_Sym) {
-			Get();
-			Expect(lparen_Sym);
-			type = MultExp();
-			Expect(rparen_Sym);
-			while (StartOf(12)) {
-				if (la.kind == plus_Sym || la.kind == minus_Sym) {
-					op = AddOp();
-					type2 = MultExp();
-				} else if (la.kind == sqrt_Sym) {
-					Get();
-					Expect(lparen_Sym);
-					type = MultExp();
-					Expect(rparen_Sym);
-				} else {
-					Get();
-					Expect(lparen_Sym);
-					type = MultExp();
-					Expect(rparen_Sym);
-					if (!isArith(type) || !isArith(type2)) {
-					SemError("arithmetic operands needed");
-					type = Types.noType;
-					}
-					else type = Types.intType;
-					CodeGen.binaryOp(op);
-				}
+		type = MultExp();
+		while (la.kind == plus_Sym || la.kind == minus_Sym) {
+			op = AddOp();
+			type2 = MultExp();
+			if (!isArith(type) || !isArith(type2)) {
+			  SemError("arithmetic operands needed");
+			  type = Types.noType;
 			}
-		} else SynErr(56);
+			else type = Types.intType;
+			CodeGen.binaryOp(op);
+		}
 		return type;
 	}
 
@@ -816,7 +721,7 @@ public class Parser {
 		} else if (la.kind == greaterequal_Sym) {
 			Get();
 			op = CodeGen.cge;
-		} else SynErr(57);
+		} else SynErr(54);
 		return op;
 	}
 
@@ -824,41 +729,17 @@ public class Parser {
 		int type;
 		int type2;
 		int op;
-		if (StartOf(9)) {
-			type = Factor();
-		} else if (la.kind == sqrt_Sym) {
-			Get();
-			Expect(lparen_Sym);
-			type = Factor();
-			Expect(rparen_Sym);
-		} else if (la.kind == sqr_Sym) {
-			Get();
-			Expect(lparen_Sym);
-			type = Factor();
-			Expect(rparen_Sym);
-			while (StartOf(13)) {
-				if (la.kind == star_Sym || la.kind == slash_Sym || la.kind == percent_Sym) {
-					op = MulOp();
-					type2 = Factor();
-				} else if (la.kind == sqrt_Sym) {
-					Get();
-					Expect(lparen_Sym);
-					type2 = Factor();
-					Expect(rparen_Sym);
-				} else {
-					Get();
-					Expect(lparen_Sym);
-					type2 = Factor();
-					Expect(rparen_Sym);
-					if (!isArith(type) || !isArith(type2)) {
-					SemError("arithmetic operands needed");
-					type = Types.noType;
-					}
-					else type = Types.intType;
-					CodeGen.binaryOp(op);
-				}
+		type = Factor();
+		while (la.kind == star_Sym || la.kind == slash_Sym || la.kind == percent_Sym) {
+			op = MulOp();
+			type2 = Factor();
+			if (!isArith(type) || !isArith(type2)) {
+			  SemError("arithmetic operands needed");
+			  type = Types.noType;
 			}
-		} else SynErr(58);
+			else type = Types.intType;
+			CodeGen.binaryOp(op);
+		}
 		return type;
 	}
 
@@ -871,67 +752,81 @@ public class Parser {
 		} else if (la.kind == minus_Sym) {
 			Get();
 			op = CodeGen.sub;
-		} else SynErr(59);
+		} else SynErr(55);
 		return op;
 	}
 
 	static int Factor() {
 		int type;
 		type = Types.noType;
-		if (StartOf(14)) {
+		switch (la.kind) {
+		case identifier_Sym: case number_Sym: case charLit_Sym: case lparen_Sym: case true_Sym: case false_Sym: case null_Sym: case new_Sym: {
 			type = Primary();
-		} else if (la.kind == plus_Sym) {
+			break;
+		}
+		case plus_Sym: {
 			Get();
 			type = Factor();
-		} else if (la.kind == plus_Sym) {
-			Get();
-			Expect(sqrt_Sym);
-			Expect(lparen_Sym);
-			type = Factor();
-			Expect(rparen_Sym);
-		} else if (la.kind == plus_Sym) {
-			Get();
-			Expect(sqr_Sym);
-			Expect(lparen_Sym);
-			type = Factor();
-			Expect(rparen_Sym);
 			if (!isArith(type)) {
-			 SemError("arithmetic operand needed");
-			 type = Types.noType;
+			  SemError("arithmetic operand needed");
+			  type = Types.noType;
 			}
 			else type = Types.intType;
-		} else if (la.kind == minus_Sym) {
+			break;
+		}
+		case minus_Sym: {
 			Get();
 			type = Factor();
-		} else if (la.kind == minus_Sym) {
-			Get();
-			type = Factor();
-		} else if (la.kind == minus_Sym) {
-			Get();
-			Expect(sqrt_Sym);
-			Expect(lparen_Sym);
-			type = Factor();
-			Expect(rparen_Sym);
-		} else if (la.kind == minus_Sym) {
-			Get();
-			Expect(sqr_Sym);
-			Expect(lparen_Sym);
-			type = Factor();
-			Expect(rparen_Sym);
 			if (!isArith(type)) {
-			 SemError("arithmetic operand needed");
-			 type = Types.noType;
+			  SemError("arithmetic operand needed");
+			  type = Types.noType;
 			}
 			else type = Types.intType;
 			CodeGen.negateInteger();
-		} else if (la.kind == bang_Sym) {
+			break;
+		}
+		case bang_Sym: {
 			Get();
 			type = Factor();
 			if (!isBool(type))
 			  SemError("Boolean operand needed");
 			type = Types.boolType;
 			CodeGen.negateBoolean();
-		} else SynErr(60);
+			break;
+		}
+		case sqr_Sym: {
+			Get();
+			Expect(lparen_Sym);
+			int argType = Expression();
+			Expect(rparen_Sym);
+			if (!isArith(argType)) {
+			 SemError("arithmetic operand needed for sqr()");
+			 type = Types.noType;
+			} else {
+			 type = argType;
+			 CodeGen.loadValue();
+			 CodeGen.duplicate();  // Duplicate value for squaring
+			 CodeGen.binaryOp(CodeGen.mul);  // Multiply the value by itself
+			}
+			break;
+		}
+		case sqrt_Sym: {
+			Get();
+			Expect(lparen_Sym);
+			int argType = Expression();
+			Expect(rparen_Sym);
+			if (!isArith(argType)) {
+			 SemError("arithmetic operand needed for sqrt()");
+			 type = Types.noType;
+			} else {
+			 type = argType;
+			 CodeGen.loadValue();
+			 CodeGen.sqrt();  // Generate code to compute sqrt
+			}
+			break;
+		}
+		default: SynErr(56); break;
+		}
 		return type;
 	}
 
@@ -947,7 +842,7 @@ public class Parser {
 		} else if (la.kind == percent_Sym) {
 			Get();
 			op = CodeGen.rem;
-		} else SynErr(61);
+		} else SynErr(57);
 		return op;
 	}
 
@@ -971,7 +866,7 @@ public class Parser {
 			    SemError("wrong kind of identifier");
 			    break;
 			}
-		} else if (StartOf(15)) {
+		} else if (StartOf(11)) {
 			con = Constant();
 			type = con.type;
 			CodeGen.loadConstant(con.value);
@@ -989,7 +884,7 @@ public class Parser {
 			Get();
 			type = Expression();
 			Expect(rparen_Sym);
-		} else SynErr(62);
+		} else SynErr(58);
 		return type;
 	}
 
@@ -1015,12 +910,8 @@ public class Parser {
 		{x,x,x,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x},
 		{x,T,T,T, T,x,T,x, x,x,x,x, x,T,T,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,T, T,T,T,T, x,x,x,x, x,x,x,x, x,x,x,x},
 		{x,T,T,x, T,x,T,x, x,x,x,x, x,T,T,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,T, T,T,T,T, x,x,x,x, x,x,x,x, x,x,x,x},
-		{x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,T, x,x,x,x, x,x,x,x, x,T,T,T, T,x,x,x},
 		{x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,T,T,T, T,x,x,x},
-		{x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,T, T,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x},
-		{x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,T, x,x,x,x, T,T,T,x, x,x,x,x, x,x,x,x},
-		{x,T,T,x, T,x,T,x, x,x,x,x, x,T,T,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,T, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x},
-		{x,x,T,x, T,x,x,x, x,x,x,x, x,T,T,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x}
+		{x,x,T,x, T,x,x,x, x,x,x,x, x,T,T,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x}
 
 	};
 
@@ -1172,11 +1063,11 @@ class Errors {
 			case 27: s = "\"write\" expected"; break;
 			case 28: s = "\"||\" expected"; break;
 			case 29: s = "\"&&\" expected"; break;
-			case 30: s = "\"sqrt\" expected"; break;
-			case 31: s = "\"sqr\" expected"; break;
-			case 32: s = "\"+\" expected"; break;
-			case 33: s = "\"-\" expected"; break;
-			case 34: s = "\"!\" expected"; break;
+			case 30: s = "\"+\" expected"; break;
+			case 31: s = "\"-\" expected"; break;
+			case 32: s = "\"!\" expected"; break;
+			case 33: s = "\"sqr\" expected"; break;
+			case 34: s = "\"sqrt\" expected"; break;
 			case 35: s = "\"new\" expected"; break;
 			case 36: s = "\"*\" expected"; break;
 			case 37: s = "\"/\" expected"; break;
@@ -1192,19 +1083,15 @@ class Errors {
 			case 47: s = "this symbol not expected in Statement"; break;
 			case 48: s = "invalid Statement"; break;
 			case 49: s = "invalid Constant"; break;
-			case 50: s = "invalid IntConst"; break;
-			case 51: s = "invalid BasicType"; break;
-			case 52: s = "invalid ReadElement"; break;
-			case 53: s = "invalid WriteElement"; break;
-			case 54: s = "invalid RelExp"; break;
-			case 55: s = "invalid EqualOp"; break;
-			case 56: s = "invalid AddExp"; break;
-			case 57: s = "invalid RelOp"; break;
-			case 58: s = "invalid MultExp"; break;
-			case 59: s = "invalid AddOp"; break;
-			case 60: s = "invalid Factor"; break;
-			case 61: s = "invalid MulOp"; break;
-			case 62: s = "invalid Primary"; break;
+			case 50: s = "invalid BasicType"; break;
+			case 51: s = "invalid ReadElement"; break;
+			case 52: s = "invalid WriteElement"; break;
+			case 53: s = "invalid EqualOp"; break;
+			case 54: s = "invalid RelOp"; break;
+			case 55: s = "invalid AddOp"; break;
+			case 56: s = "invalid Factor"; break;
+			case 57: s = "invalid MulOp"; break;
+			case 58: s = "invalid Primary"; break;
 			default: s = "error " + n; break;
 		}
 		storeError(line, col, s);
